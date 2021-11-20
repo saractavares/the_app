@@ -1,70 +1,226 @@
-# Getting Started with Create React App
+ <div align=center>
+<h1> The App
+</div>
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Este projeto foi criado com foco no Deploy, assim usamos a aplicação React padrão encontrada no [site oficial](https://create-react-app.dev/docs/getting-started). Este é um passo a passo de como construir uma aplicação em React com uso do Docker e NGINX.
 
-## Available Scripts
+### Construindo o App
+  Acesse seu terminal e com:
+  ```text
+  ctrl+Alt+t
+  ```
+  Execute os seguintes comendos em ordem:
+  ```text
+  $ mkdir myapp   // isso cria um diretório onde você criará seu app
+  $ cd myapp      // com isso você entra no seu diretório myapp
+  $ code .        // com isso você abre o VS Code dentro do diretório myapp
+  ```  
+  Acesse o site:
+  ```text
+  https://create-react-app.dev/docs/getting-started
+  ```
+  No VS Code execute um novo Terminal e os seguintes comandos que criarão o app em React:
+  ```text
+  $ npx create-react-app my-app
+  $ cd my-app
+  $ npm start
+  ```
+  Após o NPM terminar o app já estará rodando em localhost na porta 3000, se quiser conferir acesse no navegador:
+  ```text
+  localhost:3000
+  ```
+  Você observará uma imagem semelhante a esta:
+<div align=center>
+  <img src="https://miro.medium.com/max/700/1*5x6c_J1CuGYvfE-oF45nZg.png" />
+</div>
 
-In the project directory, you can run:
+Para parar o comando digite:
+  ctrl+d
+  
+  
+### Construindo a imagem Docker
+  
+Para construir a imagem Docker vamos precisar de um arquivo chamado Dockerfile. Para entender o que é o Dockerfile você pode imaginar isso como a receita do bolo com o passo a passo para o bolo se fazer sozinho em apenas 1 comando! Incrível, não é?
 
-### `yarn start`
+Crie o Dockerfile digitando o seguinte comando no terminal:
+```text
+$ touch Dockerfile
+  ```
+  Dentro do Dockerfile coloque o seguinte:
+```text
+  # Imagem de Origem
+FROM node:16.13.0-alpine
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+  # Diretório de trabalho(é onde a aplicação ficará dentro do container).
+WORKDIR /code
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+  # Instalando dependências da aplicação e armazenando em cache
+COPY package.json package.json
+COPY package-lock.json package-lock.json
 
-### `yarn test`
+RUN npm install 
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+COPY . .
 
-### `yarn build`
+  # Inicializa a aplicação
+CMD ["npm","run","start"] 
+  ```
+  
+Agora podemos fazer o build da imagem em ambiente de desenvolvimento. 
+  Os comandos que usaremos serão 
+  ```text 
+  $ Docker build --rm -t <nome da imagem:versão> .
+  // "nome da imagem:versão" poderá ser o nome que quiser, usaremos mais tarde ao rodar o container e também no docker-compose.yml.
+  // em nome da versão eu usei = react-docker:1.0.0-dev
+  ```
+  *Atenção: o " . " faz parte do comando!*
+  
+  Onde: 
+  <br>
+  " Docker build . " é o comando do Docker para construir uma imagem. Os parâmetros adicionais que passamos aqui foram:
+  <br>  " --rm" Isto significa que estamos pedindo para remover qualquer imagem mais antiga com o mesmo nome.
+  <br>  " -t" onde 't' significa "tag" e é a flag que usamos para dar um nome à nossa imagem. 
+  
+  Assim que o comando acima finalizar a construção da imagem, vamos criar o container a partir dela:
+  ```text
+$ docker run --rm -it --name web -p 3000:3000 -v "$PDW":/code react-docker:1.0.0-dev
+  ```
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+  Se tudo foi bem até aqui, após o build a saída será parecida com esta:
+  ```text
+> react-docker-app@0.1.0 start /code
+> react-scripts start
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+ℹ ｢wds｣: Project is running at http://172.17.0.2/
+ℹ ｢wds｣: webpack output is served from /
+ℹ ｢wds｣: Content not from webpack is served from /app/public
+ℹ ｢wds｣: 404s will fallback to /index.html
+Starting the development server…
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+Compiled successfully!
 
-### `yarn eject`
+You can now view react-docker-app in the browser.
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+Local: http://localhost:3000/
+On Your Network: http://172.17.0.2:3000/
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+Note that the development build is not optimized.
+To create a production build, use yarn build.
+```
+  
+ Veja que na mensagem acima, é informado que Your Network é o endereço: http://172.17.0.1:3000 , porém é importante lembrar que este é o endereço interno do container. Toda vez que um container é levantando, o Docker atribui a ele um IP, ele cria uma rede interna padrão, chamada bridge (ponte), pois é a rede que permite a comunicação interna entre os containers. A porta que foi exportada para a máquina local foi a 3001 pelo parâmentro -p. Portanto para acessar a aplicação faz-se da seguinte maneira:
+  ```text
+  localhost:3001
+  ```
+  
+  
+## O que está acontecendo até aqui?
+1 - O comando docker run criou a instância de um novo container a partir de uma imagem que foi criada através de um arquivo Dockerfile.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+2 - -v $"PWD":/code monta/leva/move o código para dentro do container no diretório “/code”.
+OBS: "PWD", pode não funcionar no windows.
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+3 - O objetivo é utilizar o diretório node_modules/ de dentro do container, por isso foi criado um segundo volume: -v /app/node_modules . Agora é possível remover o diretório local node_modules/ do diretório do seu projeto local.
 
-## Learn More
+4 - -p 3001:3000 expõe a porta 3000 a outros containers do docker na mesma rede(para comunicação entre containers) e porta 3001 ao host.
+Para mais informações veja esta tread no Stackoverflow.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+5 - Por fim, --rm remove o container e os volumes, depois que o container for finalizado.
+  
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+  -p <porta:porta> 
+    <br>  " -it" onde 'i' significa "interactive" e 't' significa "terminal".
+   <br>  "-p" significa "publish" e antecede a porta.
+  <br>  "<porta:porta>" onde a primeira é a porta de saída do nosso aplicativo, que por padrão, o React denomina a porta 3000, e a segunda é a porta de entrada para mapearmos a aplicação. Existe uma certa prática em se usar a mesma porta de entrada e saída no ambiente de desenvolvimento.
+  
+  
+# Docker-compose
+  
+## Vamos realizar a execução do container, mas agora usando um arquivo de receita do Docker, o docker-compose.yml. Crie e adicione este arquivo na raíz do projeto.
+  ```text
+version: '3.7'
+services:
+  app-prod:
+    container_name: react-docker
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - '8080:80'
+  ```
+  
+Crie a imagem e ative o container:
+  ```text
+  docker-compose up -d --build
+  ```
+Para parar pressione Ctrl+d
+  
+  
+## Produção com Docker-compose + React Router e NGINX
+  
+Antes de alterarmos o Dockerfile para receber os parâmetros de produção, precisamos configurar o Nginx-conf. Para isso, crie a seguinte estrutura no diretório raiz myapp:
+  ```md
+  └── nginx
+    └── nginx.conf
+  ```
+  No arquivo nginx.conf escreva:
+  ```text
+server {
+listen 80;
+location / {
+    root   /usr/share/nginx/html;
+    index  index.html index.htm;
+    try_files $uri $uri/ /index.html;
+  }
+error_page   500 502 503 504  /50x.html;
 
-### Code Splitting
+location = /50x.html {
+    root   /usr/share/nginx/html;
+  }
+  
+}
+  ```  
+  
+Agora que as imagens e o docker-compose de desenvolvimento estão funcionando, é hora de criar as mesmas estruturas, preparadas para a produção.
+Você editará o arquivo Dockerfile e ele se tornará Multi-Stage-Builds.
+O Dockerfile deve ser:
+  ```text
+FROM node:16.13.0-alpine as build
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+WORKDIR /code
 
-### Analyzing the Bundle Size
+COPY package.json package.json
+COPY package-lock.json package-lock.json
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+RUN npm ci --production 
 
-### Making a Progressive Web App
+COPY . .
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+RUN npm run build
 
-### Advanced Configuration
+FROM nginx:1.20.2-alpine as prod
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+COPY --from=build /code/build /usr/share/nginx/html
+RUN rm /etc/nginx/conf.d/default.conf
+COPY nginx/nginx.conf /etc/nginx/conf.d
 
-### Deployment
+EXPOSE 80
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+CMD ["nginx","-g","daemon off;"]
+  ```
+Acima, foi usado o padrão de construção em multi-estágios ou multistage build, para criar uma imagem temporária usada para armazenar um artefato — os arquivos estáticos do React, prontos para a produção — este são copiados para a imagem de produção. Em seguinda a Imagem de construção temporária é descartada junto com os arquivos e pastas originais, associados a ela. Isso produz uma imagem enxuta, pronta para a produção.
 
-### `yarn build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+No docker-compose Expusemos a porta 8080 para o conteiner, assim não usamos a porta padrão do React. Do Dockerfile Expusemos a porta 80 para o NGINX, agora vamos rodar nosso App no conteiner em produção:
+  ```text
+    docker-compose -f docker-compose.yml up -d --build
+  ```
+Para ver se o conteiner subiu, abra um terminal e digite:
+  ```text
+  $ docker ps
+  ```
+Para acessar o conteiner pela URL digite:
+  ```text
+  localhost:8080
+  ```
+  
+  
