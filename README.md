@@ -2,7 +2,7 @@
 <h1> The App
 </div>
 
-## Este projeto foi criado com foco no Deploy usando uma distribuição Linux. A Distro usada foi Kubunto 20.04LTS; assim usamos a aplicação React padrão encontrada no [site oficial](https://create-react-app.dev/docs/getting-started). Este é um passo a passo de como construir uma aplicação em React com uso do Docker e NGINX.
+## Este projeto foi criado com foco no Deploy usando uma distribuição Linux. A Distro usada foi Kubuntu 20.04LTS; assim usamos a aplicação React padrão encontrada no [site oficial](https://create-react-app.dev/docs/getting-started). Este é um passo a passo de como construir uma aplicação em React com uso do Docker e NGINX.
 
 ### Construindo o App
   Acesse seu terminal e com:
