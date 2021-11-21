@@ -126,14 +126,8 @@ OBS: "PWD", pode não funcionar no windows.
 Para mais informações veja esta tread no Stackoverflow.
 
 5 - Por fim, --rm remove o container e os volumes, depois que o container for finalizado.
-  
-
-  -p <porta:porta> 
-    <br>  " -it" onde 'i' significa "interactive" e 't' significa "terminal".
-   <br>  "-p" significa "publish" e antecede a porta.
-  <br>  "<porta:porta>" onde a primeira é a porta de saída do nosso aplicativo, que por padrão, o React denomina a porta 3000, e a segunda é a porta de entrada para mapearmos a aplicação. Existe uma certa prática em se usar a mesma porta de entrada e saída no ambiente de desenvolvimento.
-  
-  
+ 
+ 
 # Docker-compose
   
 ## Vamos realizar a execução do container, mas agora usando um arquivo de receita do Docker, o docker-compose.yml. Crie e adicione este arquivo na raíz do projeto.
