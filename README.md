@@ -26,7 +26,7 @@
  
  Pronto, a imagem já foi construída e já está rodando em localhost:8080.
  
- Para parar o build, pressione Ctrl+Alt+D
+ Para parar o build, pressione Ctrl+C
  
  ## Agora você pode construir seu próprio APP
  
