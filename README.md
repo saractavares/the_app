@@ -4,6 +4,32 @@
 
 ## Este projeto foi criado com foco no Deploy usando uma distribuição Linux. A Distro usada foi Kubuntu 20.04LTS; assim usamos a aplicação React padrão encontrada no [site oficial](https://create-react-app.dev/docs/getting-started). Este é um passo a passo de como construir uma aplicação em React com uso do Docker e NGINX.
 
+## Primeiro vamos executar em 3 passos este repositório. Depois você poderá criar seus próprios apps e builds a partir do tópico "Construindo o APP".
+ 
+### Para ver este repositório rodando:
+- Clique no botão "Code" àcima na direita e copie a URL da opção HTTPS.
+
+- Dentro de uma pasta no seu computador, destinada a este projeto, abra o terminal e digite:
+```text
+ git clone <cole aqui a URL copiada>
+ ```
+ 
+ - Agora no terminal instale o node_modules com:
+```text
+ npm install
+```
+ 
+ - Enfim, dê o comando no terminal:
+```text
+ docker-compose -f docker-compose.yml up -d --build
+ ```
+ 
+ Pronto, a imagem já foi construída e já está rodando em localhost:8080.
+ 
+ Para parar o build, pressione Ctrl+Alt+D
+ 
+ ## Agora você pode construir seu próprio APP
+ 
 ### Construindo o App
   Acesse seu terminal e com:
   ```text
