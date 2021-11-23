@@ -61,7 +61,7 @@
 </div>
 
 Para parar o comando digite:
-  ctrl+d
+  ctrl+c
   
   
 ### Construindo a imagem Docker
